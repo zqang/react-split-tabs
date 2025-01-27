@@ -1,47 +1,26 @@
 "use client";
-import { useRouter } from "next/navigation";
-import { useTabs } from "../contexts/TabContexts";
+
+import { useTabs } from "@/contexts/PaneContexts";
+import "react-tabs/style/react-tabs.css";
 
 const Navbar = () => {
-  const router = useRouter();
-  const { addTab } = useTabs();
-
-  const navigateTo = (path: string) => {
-    const pageTitle = path === "/" ? "Home" : path.split("/").pop();
-    addTab({ title: pageTitle, path }); // Add tab on navigation
-    router.push(path);
-  };
+  const { activePane, addTab, routes } = useTabs();
 
   return (
-    <nav
-      style={{
-        display: "flex",
-        gap: "20px",
-        padding: "10px",
-        background: "#f5f5f5",
-        marginBottom: "20px",
-      }}
-    >
-      <button onClick={() => navigateTo("/")} style={navButtonStyle}>
-        Home
-      </button>
-      <button onClick={() => navigateTo("/about")} style={navButtonStyle}>
-        About
-      </button>
-      <button onClick={() => navigateTo("/contact")} style={navButtonStyle}>
-        Contact
-      </button>
+    <nav className="bg-gray-800 p-4">
+      <div className="flex space-x-4">
+        {Object.values(routes).map((route) => (
+          <button
+            key={route.path}
+            className="text-white hover:bg-gray-700 px-3 py-2 rounded"
+            onClick={() => addTab(activePane, route.path)}
+          >
+            {route.title}
+          </button>
+        ))}
+      </div>
     </nav>
   );
-};
-
-const navButtonStyle = {
-  padding: "10px 20px",
-  border: "1px solid #ddd",
-  borderRadius: "5px",
-  background: "#0070f3",
-  color: "#fff",
-  cursor: "pointer",
 };
 
 export default Navbar;

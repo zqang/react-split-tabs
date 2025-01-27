@@ -1,86 +1,127 @@
 "use client";
 
-import { useRouter, usePathname } from "next/navigation";
-import { useEffect } from "react";
-import { TabsProvider, useTabs } from "../contexts/TabContexts";
+import { TabsProvider, useTabs } from "../contexts/PaneContexts";
 import "react-tabs/style/react-tabs.css";
-import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
-
-import { ReactNode } from "react";
 import Navbar from "@/components/Navbar";
+import Split from "react-split";
+import "./globals.css";
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default function RootLayout() {
   return (
     <html lang="en">
       <body>
         <TabsProvider>
-          <AppLayout>{children}</AppLayout>
+          <AppLayout />
         </TabsProvider>
       </body>
     </html>
   );
 }
 
-const AppLayout = ({ children }: { children: ReactNode }) => {
-  const { tabs, activeTabIndex, setActiveTabIndex, addTab, removeTab } =
-    useTabs();
-  const router = useRouter();
-  const pathname = usePathname();
+export const AppLayout = () => {
+  const {
+    openTabs,
+    activeTabs,
+    activePane,
+    setActivePane,
+    setActiveTab,
+    removeTab,
+    routes,
+  } = useTabs();
 
-  // Add a tab whenever the route changes
-  useEffect(() => {
-    const pageTitle = pathname === "/" ? "Home" : pathname.split("/").pop();
-    addTab({ title: pageTitle, path: pathname });
-  }, [pathname]);
-
-  const handleTabClick = (path: string, index: number) => {
-    setActiveTabIndex(index); // Set the active tab index
-    router.push(path);
+  const getComponentForPath = (path: string) => {
+    const route = Object.values(routes).find((r) => r.path === path);
+    return route ? <route.component /> : <div>404 - Not Found</div>;
   };
 
   return (
-    <div>
-      {/* Navbar */}
+    <div className="flex flex-col h-screen">
       <Navbar />
+      <div className="flex-1 overflow-hidden">
+        <Split className=" split bg-yellow-600" gutterSize={10}>
+          {/* Left Pane */}
+          <div
+            className="h-full overflow-hidden w-[50%] bg-red-800"
+            onClick={() => setActivePane("left")}
+          >
+            <div
+              className={`h-full flex flex-col border-2 ${
+                activePane === "left" ? "border-blue-500" : "border-transparent"
+              }`}
+            >
+              <div className="flex gap-2 mb-4">
+                {openTabs.left.map((tab) => (
+                  <div
+                    key={tab.path}
+                    className={`p-2 cursor-pointer ${
+                      activeTabs.left === tab.path
+                        ? "bg-blue-500 text-white"
+                        : "bg-white text-slate-600 "
+                    }`}
+                    onClick={() => setActiveTab("left", tab.path)}
+                  >
+                    {tab.title}
+                    <button
+                      className="ml-2"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        removeTab("left", tab.path);
+                      }}
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+              <div className="bg-white p-4 text-slate-800">
+                {activeTabs.left && getComponentForPath(activeTabs.left)}
+              </div>
+            </div>
+          </div>
 
-      {/* Tabs Navigation */}
-      <Tabs
-        selectedIndex={activeTabIndex}
-        onSelect={(index) => {
-          setActiveTabIndex(index);
-          router.push(tabs[index]?.path); // Navigate to the selected tab
-        }}
-      >
-        <TabList>
-          {tabs.map((tab, index) => (
-            <Tab key={tab.path}>
-              <span
-                onClick={() => handleTabClick(tab.path, index)}
-                style={{ cursor: "pointer" }}
-              >
-                {tab.title}
-              </span>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  removeTab(tab.path);
-                  router.push(tabs[0]?.path || "/"); // Navigate to the first tab or Home
-                }}
-                style={{ marginLeft: 10, color: "red", cursor: "pointer" }}
-              >
-                ✕
-              </button>
-            </Tab>
-          ))}
-        </TabList>
-
-        {/* Tabs Content */}
-        {tabs.map((tab) => (
-          <TabPanel key={tab.path}>
-            {tab.path === pathname && children}
-          </TabPanel>
-        ))}
-      </Tabs>
+          {/* Right Pane */}
+          <div
+            className="h-full overflow-hidden"
+            onClick={() => setActivePane("right")}
+          >
+            <div
+              className={`h-full flex flex-col border-2 ${
+                activePane === "right"
+                  ? "border-blue-500"
+                  : "border-transparent"
+              }`}
+            >
+              <div className="flex gap-2 mb-4">
+                {openTabs.right.map((tab) => (
+                  <div
+                    key={tab.path}
+                    className={`p-2 cursor-pointer ${
+                      activeTabs.right === tab.path
+                        ? "bg-blue-500 text-white"
+                        : "bg-white text-slate-600 "
+                    }`}
+                    onClick={() => setActiveTab("right", tab.path)}
+                  >
+                    {tab.title}
+                    <button
+                      className="ml-2"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        removeTab("right", tab.path);
+                      }}
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+              <div className="bg-white p-4 text-slate-800">
+                {activeTabs.right && getComponentForPath(activeTabs.right)}
+              </div>
+            </div>
+          </div>
+        </Split>
+      </div>
     </div>
   );
 };
