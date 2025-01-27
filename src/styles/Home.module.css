@@ -1,0 +1,40 @@
+.container {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+}
+
+.addTabButton {
+  background-color: #0070f3;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-bottom: 20px;
+}
+
+.addTabButton:hover {
+  background-color: #005bb5;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  color: red;
+  margin-left: 10px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.splitContainer {
+  display: flex;
+  height: 300px;
+  border: 1px solid #ddd;
+}
+
+.panel {
+  padding: 20px;
+  background-color: #f9f9f9;
+  overflow: auto;
+  color: black;
+}
