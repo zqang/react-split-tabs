@@ -1,19 +1,7 @@
 "use client";
 
+import { Tab, TabsContextType } from "@/types";
 import { createContext, useContext, useState } from "react";
-
-interface Tab {
-  path: string;
-  title: string | undefined;
-}
-
-interface TabsContextType {
-  tabs: Tab[];
-  activeTabIndex: number;
-  setActiveTabIndex: (index: number) => void;
-  addTab: (tab: Tab) => void;
-  removeTab: (path: string) => void;
-}
 
 const TabsContext = createContext<TabsContextType>({
   tabs: [],
